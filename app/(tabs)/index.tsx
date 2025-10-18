@@ -1,11 +1,14 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 
 import { HelloWave } from '@/components/hello-wave';
 import ParallaxScrollView from '@/components/parallax-scroll-view';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function HomeScreen() {
   return (
@@ -21,6 +24,33 @@ export default function HomeScreen() {
         <ThemedText type="title">Welcome!</ThemedText>
         <HelloWave />
       </ThemedView>
+
+      <Card>
+        <CardHeader title="Acciones rápidas" description="Atajos para tu día" />
+        <CardContent>
+          <View style={styles.actionsRow}>
+            <Button title="Ver QR" variant="default" onPress={() => {}} />
+            <Link href="/acceso">
+              <Link.Trigger>
+                <Button title="Acceso" variant="secondary" />
+              </Link.Trigger>
+            </Link>
+            <Link href="/membresia">
+              <Link.Trigger>
+                <Button title="Membresía" variant="outline" />
+              </Link.Trigger>
+            </Link>
+          </View>
+        </CardContent>
+      </Card>
+
+      <ThemedView style={styles.stepContainer}>
+        <ThemedText type="subtitle">Progreso</ThemedText>
+        <Skeleton style={{ height: 12, width: '80%' }} />
+        <Skeleton style={{ height: 12, width: '60%' }} />
+        <Skeleton style={{ height: 12, width: '70%' }} />
+      </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
@@ -36,6 +66,7 @@ export default function HomeScreen() {
           to open developer tools.
         </ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <Link href="/modal">
           <Link.Trigger>
@@ -64,6 +95,7 @@ export default function HomeScreen() {
           {`Tap the Explore tab to learn more about what's included in this starter app.`}
         </ThemedText>
       </ThemedView>
+
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
         <ThemedText>
@@ -94,5 +126,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     position: 'absolute',
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 8,
   },
 });

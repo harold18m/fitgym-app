@@ -1,0 +1,1 @@
+App for Android, React Native + Expo

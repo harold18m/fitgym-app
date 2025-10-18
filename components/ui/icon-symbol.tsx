@@ -18,6 +18,11 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  // Added mappings for app tabs
+  'figure.walk': 'directions-walk',
+  'creditcard.fill': 'credit-card',
+  'key.fill': 'vpn-key',
+  'person.crop.circle': 'account-circle',
 } as IconMapping;
 
 /**
