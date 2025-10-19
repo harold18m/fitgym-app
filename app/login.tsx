@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react';
-import { Alert, ActivityIndicator, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
-import { useRouter } from 'expo-router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { Fonts } from '@/constants/theme';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert, Image, StyleSheet, View } from 'react-native';
+
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+// import GoogleIcon from '@/components/ui/google-icon';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 
 export default function LoginScreen() {
@@ -15,6 +18,9 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const isPasswordValid = password.length >= 6;
+
   useEffect(() => {
     if (isAuthenticated) {
       router.replace('/(tabs)');
@@ -22,8 +28,8 @@ export default function LoginScreen() {
   }, [isAuthenticated, router]);
 
   const onSubmit = async () => {
-    if (!email || !password) {
-      Alert.alert('Completa ambos campos');
+    if (!email || !password || !isEmailValid || !isPasswordValid) {
+      Alert.alert('Revisa los campos', 'Email o contraseña inválidos');
       return;
     }
     try {
@@ -37,86 +43,68 @@ export default function LoginScreen() {
     }
   };
 
+  // Eliminado: onGoogle y botón de Google
+
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: '#000', dark: '#000' }} headerImage={<View />}>
+    <ThemedView>
+      <Image source={require('../assets/images/fitgym-logo.png')} style={styles.logo} />
       <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={{ fontFamily: Fonts.rounded, color: '#fff' }}>
+        <ThemedText type="title" style={{ color: '#fff' }}>
           Iniciar sesión
         </ThemedText>
       </ThemedView>
 
-      <ThemedView style={styles.form}>
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#aaa"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-          style={styles.input}
-        />
-        <TextInput
-          placeholder="Contraseña"
-          placeholderTextColor="#aaa"
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-          style={styles.input}
-        />
-        <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={onSubmit} disabled={loading}>
-          {loading ? (
-            <View style={styles.loadingRow}>
-              <ActivityIndicator color="#fff" />
-              <ThemedText type="defaultSemiBold" style={[styles.buttonText, styles.loadingText]}>Ingresando...</ThemedText>
-            </View>
-          ) : (
-            <ThemedText type="defaultSemiBold" style={styles.buttonText}>Ingresar</ThemedText>
-          )}
-        </TouchableOpacity>
-      </ThemedView>
-    </ParallaxScrollView>
+      <Card style={styles.card}>
+        <CardContent>
+          <Input
+            label="Email"
+            placeholder="email@ejemplo.com"
+            value={email}
+            onChangeText={setEmail}
+            error={!isEmailValid && email.length > 0 ? 'Ingresa un email válido' : undefined}
+            helperText={email.length === 0 ? '' : undefined}
+          />
+          <Input
+            label="Contraseña"
+            placeholder="********"
+            value={password}
+            secure
+            onChangeText={setPassword}
+            error={!isPasswordValid && password.length > 0 ? 'Mínimo 6 caracteres' : undefined}
+            helperText={password.length === 0 ? '' : undefined}
+          />
+
+          <View style={{ height: 12 }} />
+
+          <Button title="Ingresar" onPress={onSubmit} loading={loading} size="lg" />
+
+          <View style={{ alignItems: 'center', marginTop: 8 }}>
+            <Button title="¿Olvidaste tu contraseña?" variant="ghost" onPress={() => Alert.alert('Recuperar contraseña', 'Próximamente')} />
+          </View>
+        </CardContent>
+      </Card>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  logo: {
+    width: 200,
+    height: 200,
+    alignSelf: 'center',
+    marginBottom: 8,
+  },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
+    justifyContent: 'center',
+    marginBottom: 8,
   },
-  form: {
-    gap: 12,
-    marginTop: 8,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#333',
-    backgroundColor: '#111',
-    color: '#fff',
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  buttonText: {
-    color: '#fff',
-  },
-  loadingRow: {
-    flexDirection: 'row',
-    gap: 8,
-    alignItems: 'center',
-  },
-  loadingText: {
-    color: '#fff',
+  card: {
+    borderRadius: 12,
+    maxWidth: 420,
+    alignSelf: 'center',
+    margin: 16,
+    width: '90%',
   },
 });

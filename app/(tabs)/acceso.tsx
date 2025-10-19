@@ -5,11 +5,12 @@ import QRCode from 'react-native-qrcode-svg';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+
 import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import type { User } from '@supabase/supabase-js';
+import { Button } from '@/components/ui/button';
 
 export default function AccesoScreen() {
   const { isAuthenticated } = useAuth();
@@ -26,24 +27,22 @@ export default function AccesoScreen() {
 
   if (!isAuthenticated) {
     return (
-      <ParallaxScrollView headerBackgroundColor={{ light: '#fff', dark: '#000' }} headerImage={<View />}>
+      <ThemedView style={{ flex: 1, padding: 20 }}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
             Acceso
           </ThemedText>
         </ThemedView>
         <ThemedText>Debes iniciar sesión para ver tu código QR.</ThemedText>
-        <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/login')}>
-          <ThemedText type="defaultSemiBold" style={styles.loginButtonText}>Ir al login</ThemedText>
-        </TouchableOpacity>
-      </ParallaxScrollView>
+        <Button title="Ir al login" variant="secondary" onPress={() => router.push('/login')} />
+      </ThemedView>
     );
   }
 
   const value = user ? JSON.stringify({ type: 'fitgym-access', user_id: user.id, email: user.email }) : '';
 
   return (
-    <ParallaxScrollView headerBackgroundColor={{ light: '#fff', dark: '#000' }} headerImage={<View />}>
+    <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
           Acceso
@@ -53,14 +52,14 @@ export default function AccesoScreen() {
       <ThemedView style={styles.qrContainer}>
         {user ? (
           <View style={styles.qrBox}>
-            <QRCode value={value} size={220} color="#000" backgroundColor="#fff" />
-            <ThemedText style={styles.qrLabel}>Tu código de acceso</ThemedText>
+            <QRCode value={value} size={180} />
           </View>
         ) : (
-          <ThemedText>Cargando usuario...</ThemedText>
+          <ThemedText>No se encontró usuario.</ThemedText>
         )}
+        <ThemedText style={styles.qrLabel}>Presenta este código en recepción</ThemedText>
       </ThemedView>
-    </ParallaxScrollView>
+    </ThemedView>
   );
 }
 
@@ -85,16 +84,5 @@ const styles = StyleSheet.create({
     color: '#000',
     textAlign: 'center',
   },
-  loginButton: {
-    marginTop: 12,
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#fff',
-  },
-  loginButtonText: {
-    color: '#fff',
-  },
+
 });

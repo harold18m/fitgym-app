@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, ViewStyle, View } from 'react-native';
 import { useThemeColor } from '@/hooks/use-theme-color';
 
 export type ButtonVariant = 'default' | 'outline' | 'ghost' | 'destructive' | 'secondary';
@@ -13,6 +13,7 @@ export type ButtonProps = {
   variant?: ButtonVariant;
   size?: ButtonSize;
   style?: ViewStyle;
+  leftIcon?: React.ReactNode;
 };
 
 export function Button({
@@ -23,6 +24,7 @@ export function Button({
   variant = 'default',
   size = 'md',
   style,
+  leftIcon,
 }: ButtonProps) {
   const bg = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -32,14 +34,17 @@ export function Button({
   return (
     <Pressable
       onPress={onPress}
-      android_ripple={{ color: '#00000022' }}
+      android_ripple={{ color: '#ffffff22' }}
       style={({ pressed }) => [container, pressed && { opacity: 0.95 }, style]}
       disabled={disabled || loading}
     >
       {loading ? (
         <ActivityIndicator size="small" color={variantColors[variant].content(textColor)} />
       ) : (
-        <Text style={label}>{title}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          {leftIcon ? leftIcon : null}
+          <Text style={label}>{title}</Text>
+        </View>
       )}
     </Pressable>
   );
@@ -48,21 +53,21 @@ export function Button({
 const variantColors = {
   default: {
     bg: (bg: string) => '#000',
-    border: () => '#000',
+    border: () => '#fff',
     content: () => '#fff',
   },
   secondary: {
-    bg: () => '#fff',
-    border: () => '#000',
-    content: () => '#000',
+    bg: () => '#111',
+    border: () => '#fff',
+    content: () => '#fff',
   },
   outline: {
-    bg: (bg: string) => bg,
-    border: () => '#000',
-    content: (text: string) => '#000',
+    bg: () => 'transparent',
+    border: () => '#fff',
+    content: () => '#fff',
   },
   ghost: {
-    bg: (bg: string) => bg,
+    bg: () => 'transparent',
     border: () => 'transparent',
     content: (text: string) => text,
   },

@@ -1,9 +1,9 @@
 import { StyleSheet, TouchableOpacity, View } from 'react-native';
 
-import ParallaxScrollView from '@/components/parallax-scroll-view';
+
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
+
 import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'expo-router';
@@ -32,42 +32,20 @@ export default function PerfilScreen() {
 
   if (!isAuthenticated) {
     return (
-      <ParallaxScrollView
-        headerBackgroundColor={{ light: '#E7E7F9', dark: '#2E2E47' }}
-        headerImage={
-          <IconSymbol
-            size={280}
-            color="#808080"
-            name="person.crop.circle"
-            style={styles.headerImage}
-          />
-        }>
+      <ThemedView style={{ flex: 1, padding: 20 }}>
         <ThemedView style={styles.titleContainer}>
           <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
             Perfil
           </ThemedText>
         </ThemedView>
-        <ThemedText>
-          Necesitas iniciar sesión para ver tu perfil.
-        </ThemedText>
-        <TouchableOpacity style={styles.loginButton} onPress={() => router.push('/login')}>
-          <ThemedText type="defaultSemiBold" style={styles.loginButtonText}>Ir al login</ThemedText>
-        </TouchableOpacity>
-      </ParallaxScrollView>
+        <ThemedText>Necesitas iniciar sesión para ver tu perfil.</ThemedText>
+        <Button title="Ir al login" variant="secondary" onPress={() => router.push('/login')} />
+      </ThemedView>
     );
   }
 
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#E7E7F9', dark: '#2E2E47' }}
-      headerImage={
-        <IconSymbol
-          size={280}
-          color="#808080"
-          name="person.crop.circle"
-          style={styles.headerImage}
-        />
-      }>
+    <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
           Perfil
@@ -102,31 +80,16 @@ export default function PerfilScreen() {
           <Button title="Cerrar sesión" variant="destructive" onPress={logout} />
         </CardFooter>
       </Card>
-    </ParallaxScrollView>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
-  },
   titleContainer: {
     flexDirection: 'row',
     gap: 8,
   },
-  loginButton: {
-    backgroundColor: '#1565C0',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 12,
-  },
-  loginButtonText: {
-    color: '#fff',
-  },
+
   row: {
     flexDirection: 'row',
     gap: 12,

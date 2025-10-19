@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, TextInput, Text, StyleSheet, ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { View, TextInput, Text, StyleSheet, ViewStyle, Pressable } from 'react-native';
 import { useThemeColor } from '@/hooks/use-theme-color';
+import { Ionicons } from '@expo/vector-icons';
 
 export type InputProps = {
   label?: string;
@@ -11,6 +12,7 @@ export type InputProps = {
   error?: string;
   disabled?: boolean;
   style?: ViewStyle;
+  secure?: boolean;
 };
 
 export function Input({
@@ -22,23 +24,36 @@ export function Input({
   error,
   disabled,
   style,
+  secure,
 }: InputProps) {
   const bg = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
 
   const borderColor = error ? '#d32f2f' : '#000';
+  const [hidden, setHidden] = useState(!!secure);
 
   return (
     <View style={[styles.container, style]}>
       {label ? <Text style={[styles.label, { color: textColor }]}>{label}</Text> : null}
-      <TextInput
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        editable={!disabled}
-        style={[styles.input, { backgroundColor: bg, color: textColor, borderColor }]}
-        placeholderTextColor="#888"
-      />
+      <View style={styles.inputWrapper}>
+        <TextInput
+          value={value}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          editable={!disabled}
+          secureTextEntry={!!secure && hidden}
+          textContentType={secure ? 'password' : 'none'}
+          autoCapitalize={secure ? 'none' : 'none'}
+          autoCorrect={false}
+          style={[styles.input, { backgroundColor: '#fff', color: '#000', borderColor }]}
+          placeholderTextColor="#666"
+        />
+        {secure ? (
+          <Pressable style={styles.toggle} onPress={() => setHidden(!hidden)}>
+            <Ionicons name={hidden ? 'eye' : 'eye-off'} size={20} color="#000" />
+          </Pressable>
+        ) : null}
+      </View>
       {error ? <Text style={styles.error}>{error}</Text> : null}
       {!error && helperText ? <Text style={styles.helper}>{helperText}</Text> : null}
     </View>
@@ -51,12 +66,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  inputWrapper: {
+    position: 'relative',
+  },
   input: {
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 10,
+    paddingRight: 36,
     fontSize: 16,
+  },
+  toggle: {
+    position: 'absolute',
+    right: 10,
+    top: 10,
   },
   helper: {
     fontSize: 12,
