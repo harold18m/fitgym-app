@@ -17,20 +17,6 @@ export default function MembresiaScreen() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
 
-  if (!isAuthenticated) {
-    return (
-      <ThemedView style={{ flex: 1, padding: 20 }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
-            Membresía
-          </ThemedText>
-        </ThemedView>
-        <ThemedText>Necesitas iniciar sesión para ver tu membresía.</ThemedText>
-        <Button title="Ir al login" variant="secondary" onPress={() => router.push('/login')} />
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedView style={styles.titleContainer}>

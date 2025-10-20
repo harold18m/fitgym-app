@@ -1,15 +1,16 @@
 import React from 'react';
-import { Text, View, StyleSheet } from 'react-native';
+import { Text, View, StyleSheet, ViewStyle } from 'react-native';
 
 export type BadgeProps = {
   label: string;
   variant?: 'default' | 'secondary' | 'outline' | 'success' | 'warning' | 'destructive';
+  style?: ViewStyle;
 };
 
-export function Badge({ label, variant = 'default' }: BadgeProps) {
+export function Badge({ label, variant = 'default', style }: BadgeProps) {
   const v = getVariant(variant);
   return (
-    <View style={[styles.container, { backgroundColor: v.bg, borderColor: v.border }]}> 
+    <View style={[styles.container, { backgroundColor: v.bg, borderColor: v.border }, style]}> 
       <Text style={[styles.label, { color: v.text }]}>{label}</Text>
     </View>
   );

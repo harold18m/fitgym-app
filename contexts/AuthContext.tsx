@@ -4,6 +4,7 @@ import { supabase } from '@/utils/supabase';
 
 type AuthContextValue = {
   isAuthenticated: boolean;
+  authReady: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 };
@@ -12,11 +13,13 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     const init = async () => {
       const { data } = await supabase.auth.getSession();
       setIsAuthenticated(!!data.session);
+      setAuthReady(true);
     };
     init();
 
@@ -42,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const value = useMemo(() => ({ isAuthenticated, login, logout }), [isAuthenticated]);
+  const value = useMemo(() => ({ isAuthenticated, authReady, login, logout }), [isAuthenticated, authReady]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

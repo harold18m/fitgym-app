@@ -24,7 +24,7 @@ export function Avatar({ size = 'md', src, name }: AvatarProps) {
     : '?';
 
   return (
-    <View style={[styles.fallback, { width: dimension, height: dimension, borderRadius: 999 }]}> 
+    <View style={[styles.fallback, { width: dimension, height: dimension, borderRadius: 999, borderColor: '#fff', borderWidth: 1 }]}> 
       <Text style={styles.initials}>{initials}</Text>
     </View>
   );

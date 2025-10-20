@@ -30,20 +30,6 @@ export default function PerfilScreen() {
     load();
   }, []);
 
-  if (!isAuthenticated) {
-    return (
-      <ThemedView style={{ flex: 1, padding: 20 }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
-            Perfil
-          </ThemedText>
-        </ThemedView>
-        <ThemedText>Necesitas iniciar sesión para ver tu perfil.</ThemedText>
-        <Button title="Ir al login" variant="secondary" onPress={() => router.push('/login')} />
-      </ThemedView>
-    );
-  }
-
   return (
     <ThemedView style={{ flex: 1, padding: 20 }}>
       <ThemedView style={styles.titleContainer}>

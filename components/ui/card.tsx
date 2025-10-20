@@ -9,11 +9,12 @@ export function Card({ children, style }: CardProps) {
   return <View style={[styles.card, style]}>{children}</View>;
 }
 
-export function CardHeader({ title, description }: { title: string; description?: string }) {
+export function CardHeader({ title, description, align = 'left' }: { title: string; description?: string; align?: 'left' | 'center' }) {
+  const centered = align === 'center';
   return (
-    <View style={styles.header}>
-      <Text style={styles.title}>{title}</Text>
-      {description ? <Text style={styles.description}>{description}</Text> : null}
+    <View style={[styles.header, centered && { alignItems: 'center' }]}> 
+      <Text style={[styles.title, centered && { textAlign: 'center' }]}>{title}</Text>
+      {description ? <Text style={[styles.description, centered && { textAlign: 'center' }]}>{description}</Text> : null}
     </View>
   );
 }

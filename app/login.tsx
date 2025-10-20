@@ -2,11 +2,12 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, Image, StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 // import GoogleIcon from '@/components/ui/google-icon';
+import Logo from '@/components/logo';
 import { Input } from '@/components/ui/input';
 import { useAuth } from '@/contexts/AuthContext';
 
@@ -35,7 +36,6 @@ export default function LoginScreen() {
     try {
       setLoading(true);
       await login(email, password);
-      Alert.alert('Sesión iniciada', `Bienvenido ${email}`);
     } catch (e) {
       // Error visible desde AuthContext
     } finally {
@@ -46,8 +46,8 @@ export default function LoginScreen() {
   // Eliminado: onGoogle y botón de Google
 
   return (
-    <ThemedView>
-      <Image source={require('../assets/images/fitgym-logo.png')} style={styles.logo} />
+    <ThemedView style={styles.container}>
+      <Logo style={styles.logo as any} />
       <ThemedView style={styles.titleContainer}>
         <ThemedText type="title" style={{ color: '#fff' }}>
           Iniciar sesión
@@ -58,7 +58,7 @@ export default function LoginScreen() {
         <CardContent>
           <Input
             label="Email"
-            placeholder="email@ejemplo.com"
+            placeholder="email@fitgym.com"
             value={email}
             onChangeText={setEmail}
             error={!isEmailValid && email.length > 0 ? 'Ingresa un email válido' : undefined}
@@ -88,6 +88,11 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 16,
+  },
   logo: {
     width: 200,
     height: 200,

@@ -1,27 +1,21 @@
-import React, { useEffect } from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
-import { useRouter } from 'expo-router';
+import Logo from '@/components/logo';
 import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'expo-router';
+import React, { useEffect } from 'react';
+import { StyleSheet, View } from 'react-native';
 
 export default function SplashScreen() {
   const router = useRouter();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, authReady } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        router.replace('/(tabs)');
-      } else {
-        router.replace('/login');
-      }
-    }, 1200);
-    return () => clearTimeout(timer);
-  }, [isAuthenticated, router]);
+    if (!authReady) return;
+    router.replace(isAuthenticated ? '/(tabs)' : '/login');
+  }, [authReady, isAuthenticated, router]);
 
   return (
     <View style={styles.container}>
-      <Image source={require('../assets/images/splash-icon.png')} style={styles.logo} resizeMode="contain" />
-      <Text style={styles.title}>FITGYM</Text>
+      <Logo />
     </View>
   );
 }
@@ -37,11 +31,5 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     marginBottom: 16,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
+  }
 });
