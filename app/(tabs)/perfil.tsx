@@ -1,25 +1,22 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
-
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 
-import { Fonts } from '@/constants/theme';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'expo-router';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Screen } from '@/components/screen';
 import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
-import type { User } from '@supabase/supabase-js';
+import { TopBar } from '@/components/ui/top-bar';
+import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
+import type { User } from '@supabase/supabase-js';
+import { useEffect, useState } from 'react';
 
 export default function PerfilScreen() {
-  const { isAuthenticated, logout } = useAuth();
-  const router = useRouter();
+  const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -31,12 +28,11 @@ export default function PerfilScreen() {
   }, []);
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
-          Perfil
-        </ThemedText>
-      </ThemedView>
+    <Screen style={{ flex: 1 }}>
+      <TopBar
+        rightIconName="gearshape.fill"
+        onPressRight={() => Alert.alert('Configuración', 'Próximamente')}
+      />
 
       <Card>
         <CardHeader title="Tu cuenta" description="Resumen de perfil y estado" />
@@ -62,11 +58,11 @@ export default function PerfilScreen() {
           )}
         </CardContent>
         <CardFooter>
-          <Button title="Editar" variant="secondary" onPress={() => {}} />
+          <Button title="Editar" variant="secondary" onPress={() => { }} />
           <Button title="Cerrar sesión" variant="destructive" onPress={logout} />
         </CardFooter>
       </Card>
-    </ThemedView>
+    </Screen>
   );
 }
 

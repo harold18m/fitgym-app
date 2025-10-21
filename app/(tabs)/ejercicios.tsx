@@ -1,30 +1,14 @@
-import { StyleSheet } from 'react-native';
-
-
+import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-
-import { Fonts } from '@/constants/theme';
+import { TopBar } from '@/components/ui/top-bar';
 
 export default function EjerciciosScreen() {
   return (
-    <ThemedView style={{ flex: 1, padding: 20 }}>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
-          Ejercicios
-        </ThemedText>
-      </ThemedView>
+    <Screen contentPadding={20} style={{ flex: 1 }}>
+      <TopBar />
       <ThemedText>
         Explora rutinas, planes y recomendaciones para tu entrenamiento.
       </ThemedText>
-    </ThemedView>
+    </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-});

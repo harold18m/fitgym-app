@@ -1,19 +1,23 @@
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, StyleSheet, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 // import GoogleIcon from '@/components/ui/google-icon';
 import Logo from '@/components/logo';
+import { Screen } from '@/components/screen';
+import { ThemedText } from '@/components/themed-text';
 import { Input } from '@/components/ui/input';
+import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const { isAuthenticated, login } = useAuth();
   const router = useRouter();
+
+  const insets = useSafeAreaInsets();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -43,73 +47,39 @@ export default function LoginScreen() {
     }
   };
 
-  // Eliminado: onGoogle y botón de Google
-
   return (
-    <ThemedView style={styles.container}>
-      <Logo style={styles.logo as any} />
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title" style={{ color: '#fff' }}>
-          Iniciar sesión
-        </ThemedText>
-      </ThemedView>
-
-      <Card style={styles.card}>
-        <CardContent>
-          <Input
-            label="Email"
-            placeholder="email@fitgym.com"
-            value={email}
-            onChangeText={setEmail}
-            error={!isEmailValid && email.length > 0 ? 'Ingresa un email válido' : undefined}
-            helperText={email.length === 0 ? '' : undefined}
-          />
-          <Input
-            label="Contraseña"
-            placeholder="********"
-            value={password}
-            secure
-            onChangeText={setPassword}
-            error={!isPasswordValid && password.length > 0 ? 'Mínimo 6 caracteres' : undefined}
-            helperText={password.length === 0 ? '' : undefined}
-          />
-
-          <View style={{ height: 12 }} />
-
-          <Button title="Ingresar" onPress={onSubmit} loading={loading} size="lg" />
-
-          <View style={{ alignItems: 'center', marginTop: 8 }}>
-            <Button title="¿Olvidaste tu contraseña?" variant="ghost" onPress={() => Alert.alert('Recuperar contraseña', 'Próximamente')} />
+    <Screen contentPadding={20} style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
+      >
+        <ScrollView keyboardDismissMode="on-drag" keyboardShouldPersistTaps="handled">
+          <View style={styles.titleContainer}>
+            <Logo />
+            <ThemedText type="title" style={{ fontFamily: Fonts.rounded }}>
+              Iniciar sesión
+            </ThemedText>
           </View>
-        </CardContent>
-      </Card>
-    </ThemedView>
+
+          <Card>
+            <CardContent>
+              <Input label="Email" placeholder="tu@email.com" value={email} onChangeText={setEmail} />
+              <Input label="Contraseña" placeholder="••••••" value={password} onChangeText={setPassword} secure />
+              <Button title={loading ? 'Entrando…' : 'Entrar'} variant="default" onPress={onSubmit} disabled={loading} />
+            </CardContent>
+          </Card>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-  },
-  logo: {
-    width: 200,
-    height: 200,
-    alignSelf: 'center',
-    marginBottom: 8,
-  },
   titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  card: {
-    borderRadius: 12,
-    maxWidth: 420,
-    alignSelf: 'center',
-    margin: 16,
-    width: '90%',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: 12,
+    marginVertical: 16,
   },
 });

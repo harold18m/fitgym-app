@@ -4,7 +4,6 @@ import { StyleSheet, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 
 import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,6 +13,8 @@ import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import type { User } from '@supabase/supabase-js';
+import { Screen } from '@/components/screen';
+import { TopBar } from '@/components/ui/top-bar';
 
 export default function AccesoScreen() {
   const { isAuthenticated } = useAuth();
@@ -61,43 +62,45 @@ export default function AccesoScreen() {
 
   if (!isAuthenticated) {
     return (
-      <ThemedView style={{ flex: 1, padding: 20 }}>
-        <ThemedView style={styles.titleContainer}>
-          <ThemedText type="title" style={{ fontFamily: Fonts.rounded, color: '#fff', textAlign: 'center', width: '100%' }}>
-            Acceso
-          </ThemedText>
-        </ThemedView>
-        <ThemedText style={{ color: '#fff', marginBottom: 12, textAlign: 'center' }}>Debes iniciar sesión para ver tu código de acceso.</ThemedText>
+      <Screen contentPadding={20} style={{ flex: 1 }}>
+        <TopBar />
+        <ThemedText style={{ color: '#fff', marginBottom: 12, textAlign: 'center' }}>
+          Debes iniciar sesión para ver tu código de acceso.
+        </ThemedText>
         <View style={{ alignItems: 'center' }}>
           <Button title="Ir al login" variant="secondary" onPress={() => router.push('/login')} />
         </View>
-      </ThemedView>
+      </Screen>
     );
   }
 
   const value = dni ? dni : '';
 
   return (
-    <ThemedView style={{ flex: 1, padding: 20, justifyContent: 'center', alignItems: 'center' }}>
-      <Card style={styles.card}>
-        <CardHeader title="Tu código de acceso" description="Presenta el QR en recepción" align="center" />
-        <CardContent>
-          <View style={{ alignItems: 'center' }}>
-            <View style={styles.qrBox}>
-              {value ? (
-                <QRCode value={value} size={200} />
-              ) : (
-                <Skeleton style={{ width: 200, height: 200, borderRadius: 8 }} />
-              )}
+    <Screen contentPadding={20} style={{ flex: 1 }}>
+      <TopBar />
+
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Card style={styles.card}>
+          <CardHeader title="Tu código de acceso" description="Presenta el QR en recepción" align="center" />
+          <CardContent>
+            <View style={{ alignItems: 'center' }}>
+              <View style={styles.qrBox}>
+                {value ? (
+                  <QRCode value={value} size={200} />
+                ) : (
+                  <Skeleton style={{ width: 200, height: 200, borderRadius: 8 }} />
+                )}
+              </View>
+              <Badge
+                label={estado ? `Membresía ${estado}` : 'Membresía'}
+                variant={estado === 'activa' ? 'success' : estado === 'vencida' ? 'destructive' : estado === 'pausada' ? 'warning' : 'secondary'}
+                style={{ alignSelf: 'center', marginTop: 8 }}
+              />
             </View>
-            <Badge
-              label={estado ? `Membresía ${estado}` : 'Membresía'}
-              variant={estado === 'activa' ? 'success' : estado === 'vencida' ? 'destructive' : estado === 'pausada' ? 'warning' : 'secondary'}
-              style={{ alignSelf: 'center', marginTop: 8 }}
-            />
-          </View>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </View>
 
       <View style={styles.clockContainer}>
         <ThemedText style={styles.clockText}>{now.toLocaleTimeString()}</ThemedText>
@@ -115,15 +118,11 @@ export default function AccesoScreen() {
           <Button title="Cerrar" variant="secondary" onPress={() => setFullScreen(false)} />
         </View>
       )}
-    </ThemedView>
+    </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
-  },
   card: {
     borderRadius: 12,
     maxWidth: 640,

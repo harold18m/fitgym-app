@@ -18,6 +18,8 @@ const MAPPING = {
   'paperplane.fill': 'send',
   'chevron.left.forwardslash.chevron.right': 'code',
   'chevron.right': 'chevron-right',
+  'chevron.left': 'chevron-left',
+  'gearshape.fill': 'settings',
   // Added mappings for app tabs
   'figure.walk': 'directions-walk',
   'creditcard.fill': 'credit-card',
