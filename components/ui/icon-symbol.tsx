@@ -20,6 +20,7 @@ const MAPPING = {
   'chevron.right': 'chevron-right',
   'chevron.left': 'chevron-left',
   'gearshape.fill': 'settings',
+  'bell.fill': 'notifications',
   // Added mappings for app tabs
   'figure.walk': 'directions-walk',
   'creditcard.fill': 'credit-card',

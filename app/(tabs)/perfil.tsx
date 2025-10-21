@@ -30,6 +30,8 @@ export default function PerfilScreen() {
   return (
     <Screen style={{ flex: 1 }}>
       <TopBar
+        title="Perfil"
+        showBack={false}
         rightIconName="gearshape.fill"
         onPressRight={() => Alert.alert('Configuración', 'Próximamente')}
       />
