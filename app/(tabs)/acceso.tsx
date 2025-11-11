@@ -78,43 +78,75 @@ export default function AccesoScreen() {
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
-      <TopBar />
+      <TopBar title="Acceso al gimnasio" />
+      
+      <View style={styles.container}>
+        <View style={styles.section}>
+          <ThemedText type="subtitle">Tu código de acceso</ThemedText>
+          <ThemedText style={{ textAlign: 'center', marginBottom: 20 }}>
+            Muestra este código QR en la entrada del gimnasio
+          </ThemedText>
+        </View>
 
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Card style={styles.card}>
-          <CardHeader title="Tu código de acceso" description="Presenta el QR en recepción" align="center" />
-          <CardContent>
-            <View style={{ alignItems: 'center' }}>
-              <View style={styles.qrBox}>
-                {value ? (
-                  <QRCode value={value} size={200} />
-                ) : (
-                  <Skeleton style={{ width: 200, height: 200, borderRadius: 8 }} />
-                )}
-              </View>
-              <Badge
-                label={estado ? `Membresía ${estado}` : 'Membresía'}
-                variant={estado === 'activa' ? 'success' : estado === 'vencida' ? 'destructive' : estado === 'pausada' ? 'warning' : 'secondary'}
-                style={{ alignSelf: 'center', marginTop: 8 }}
-              />
+        <View style={styles.qrContainer}>
+          {value ? (
+            <View style={styles.qrBox}>
+              <QRCode value={value} size={220} />
             </View>
-          </CardContent>
-        </Card>
-      </View>
+          ) : (
+            <Skeleton style={{ width: 252, height: 252 }} />
+          )}
+          
+          <View style={styles.userInfo}>
+            <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
+              {user?.email || 'Cargando...'}
+            </ThemedText>
+            <ThemedText style={{ textAlign: 'center', opacity: 0.7 }}>
+              {dni ? `ID: ${dni}` : 'Obteniendo información...'}
+            </ThemedText>
+            {estado && (
+              <Badge 
+                label={estado === 'activo' ? 'Membresía Activa' : 'Membresía Inactiva'} 
+                variant={estado === 'activo' ? 'success' : 'destructive'} 
+              />
+            )}
+          </View>
+        </View>
 
-      <View style={styles.clockContainer}>
-        <ThemedText style={styles.clockText}>{now.toLocaleTimeString()}</ThemedText>
+        <View style={styles.actions}>
+          <Button
+            title="Ampliar código"
+            variant="secondary"
+            onPress={() => setFullScreen(true)}
+            disabled={!value}
+          />
+        </View>
+
+        <View style={styles.timeContainer}>
+          <ThemedText type="defaultSemiBold" style={styles.timeText}>
+            {now.toLocaleTimeString('es-MX', { 
+              hour: '2-digit', 
+              minute: '2-digit', 
+              second: '2-digit' 
+            })}
+          </ThemedText>
+          <ThemedText style={{ opacity: 0.7, textAlign: 'center' }}>
+            Hora actual del sistema
+          </ThemedText>
+        </View>
       </View>
 
       {fullScreen && (
         <View style={styles.fullScreenOverlay}>
           <View style={styles.qrBoxLarge}>
-            {value ? (
-              <QRCode value={value} size={280} />
-            ) : (
-              <Skeleton style={{ width: 280, height: 280, borderRadius: 8 }} />
-            )}
+            <QRCode value={value} size={300} />
           </View>
+          <ThemedText style={{ color: '#fff', textAlign: 'center', fontSize: 18 }}>
+            {user?.email}
+          </ThemedText>
+          <ThemedText style={{ color: '#fff', textAlign: 'center', opacity: 0.8 }}>
+            {dni ? `ID: ${dni}` : 'Cargando información...'}
+          </ThemedText>
           <Button title="Cerrar" variant="secondary" onPress={() => setFullScreen(false)} />
         </View>
       )}
@@ -123,37 +155,54 @@ export default function AccesoScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    borderRadius: 12,
-    maxWidth: 640,
-    width: '100%',
-    alignSelf: 'center',
+  container: {
+    flex: 1,
+    justifyContent: 'space-between',
+  },
+  section: {
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  qrContainer: {
+    alignItems: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    gap: 20,
   },
   qrBox: {
     backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
-    borderColor: '#000',
+    borderColor: '#ddd',
     borderWidth: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   qrBoxLarge: {
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 12,
-    borderColor: '#000',
+    borderColor: '#ddd',
     borderWidth: 1,
   },
-  clockContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 0,
-    right: 0,
+  userInfo: {
     alignItems: 'center',
+    gap: 8,
   },
-  clockText: {
-    color: '#fff',
+  actions: {
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  timeContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  timeText: {
+    fontSize: 24,
     fontFamily: Fonts.rounded,
-    fontSize: 20,
   },
   fullScreenOverlay: {
     position: 'absolute',
@@ -161,10 +210,10 @@ const styles = StyleSheet.create({
     top: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.7)',
+    backgroundColor: 'rgba(0,0,0,0.9)',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 12,
-    padding: 16,
+    gap: 16,
+    padding: 20,
   },
 });

@@ -13,26 +13,55 @@ export default function HomeScreen() {
       <TopBar title='Fitgym' showBack={false} rightIconName="bell.fill" />
 
       <View style={styles.section}>
-        <ThemedText type="subtitle">Tu progreso</ThemedText>
+        <ThemedText type="subtitle">Entrenamiento de hoy</ThemedText>
         <View style={styles.cardLight}>
-          <ThemedText darkColor="#111">Visitas este mes</ThemedText>
-          <ThemedText type="defaultSemiBold" darkColor="#111">8</ThemedText>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View>
+              <ThemedText type="defaultSemiBold" darkColor="#111">Lunes - Tren superior</ThemedText>
+              <ThemedText darkColor="#666">6 ejercicios programados</ThemedText>
+            </View>
+            <ThemedText darkColor="#4CAF50" style={{ fontSize: 12, fontWeight: '600' }}>
+              2/6 completados
+            </ThemedText>
+          </View>
+        </View>
+        <Pressable style={styles.quickButton} onPress={() => router.push('/(tabs)/ejercicios')}>
+          <ThemedText darkColor="#111">Continuar rutina</ThemedText>
+        </Pressable>
+      </View>
+
+      <View style={styles.section}>
+        <ThemedText type="subtitle">Estado del gimnasio</ThemedText>
+        <View style={styles.cardLight}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <View>
+              <ThemedText type="defaultSemiBold" darkColor="#111">Ocupación actual</ThemedText>
+              <ThemedText darkColor="#666">Nivel moderado</ThemedText>
+            </View>
+            <View style={{ backgroundColor: '#FFA726', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+              <ThemedText style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>65%</ThemedText>
+            </View>
+          </View>
         </View>
         <View style={styles.cardLight}>
-          <ThemedText darkColor="#111">Última visita</ThemedText>
-          <ThemedText type="defaultSemiBold" darkColor="#111">Ayer</ThemedText>
+          <ThemedText type="defaultSemiBold" darkColor="#111">Horarios menos concurridos</ThemedText>
+          <ThemedText darkColor="#666">• 6:00 - 8:00 AM</ThemedText>
+          <ThemedText darkColor="#666">• 2:00 - 4:00 PM</ThemedText>
+          <ThemedText darkColor="#666">• 9:00 - 11:00 PM</ThemedText>
         </View>
       </View>
 
       <View style={styles.section}>
-        <ThemedText type="subtitle">Notificaciones</ThemedText>
-        <View style={styles.cardLight}>
-          <ThemedText darkColor="#111">Tu membresía vence en 5 días.</ThemedText>
-          <ThemedText darkColor="#555">Actualiza tu plan para continuar.</ThemedText>
-        </View>
-        <View style={styles.cardLight}>
-          <ThemedText darkColor="#111">Nueva rutina disponible.</ThemedText>
-          <ThemedText darkColor="#555">Explora ejercicios recomendados.</ThemedText>
+        <ThemedText type="subtitle">Tu progreso</ThemedText>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <View style={[styles.cardLight, { flex: 1 }]}>
+            <ThemedText type="defaultSemiBold" darkColor="#111">28</ThemedText>
+            <ThemedText darkColor="#666" style={{ fontSize: 12 }}>Visitas este mes</ThemedText>
+          </View>
+          <View style={[styles.cardLight, { flex: 1 }]}>
+            <ThemedText type="defaultSemiBold" darkColor="#111">156</ThemedText>
+            <ThemedText darkColor="#666" style={{ fontSize: 12 }}>Total entrenamientos</ThemedText>
+          </View>
         </View>
       </View>
 
