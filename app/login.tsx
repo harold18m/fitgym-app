@@ -23,7 +23,6 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const isPasswordValid = password.length >= 6;
 
   useEffect(() => {
@@ -33,13 +32,16 @@ export default function LoginScreen() {
   }, [isAuthenticated, router]);
 
   const onSubmit = async () => {
-    if (!email || !password || !isEmailValid || !isPasswordValid) {
+    if (!email || !password || !isPasswordValid) {
       Alert.alert('Revisa los campos', 'Email o contraseña inválidos');
       return;
     }
     try {
       setLoading(true);
-      await login(email, password);
+      // concatenar email con dominio fijo
+      const domain = '@fitgym.com.pe';
+      const fullEmail = `${email}${domain}`;
+      await login(fullEmail, password);
     } catch (e) {
       // Error visible desde AuthContext
     } finally {
@@ -64,7 +66,7 @@ export default function LoginScreen() {
 
           <Card>
             <CardContent>
-              <Input label="Email" placeholder="tu@email.com" value={email} onChangeText={setEmail} />
+              <Input label="Código" placeholder="Tu código" value={email} onChangeText={setEmail} />
               <Input label="Contraseña" placeholder="••••••" value={password} onChangeText={setPassword} secure />
               <Button title={loading ? 'Entrando…' : 'Entrar'} variant="default" onPress={onSubmit} disabled={loading} />
             </CardContent>

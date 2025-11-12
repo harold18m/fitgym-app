@@ -5,16 +5,14 @@ import QRCode from 'react-native-qrcode-svg';
 
 import { ThemedText } from '@/components/themed-text';
 
-import { Badge } from '@/components/ui/badge';
+import { Screen } from '@/components/screen';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TopBar } from '@/components/ui/top-bar';
 import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
 import type { User } from '@supabase/supabase-js';
-import { Screen } from '@/components/screen';
-import { TopBar } from '@/components/ui/top-bar';
 
 export default function AccesoScreen() {
   const { isAuthenticated } = useAuth();
@@ -23,7 +21,6 @@ export default function AccesoScreen() {
   const [now, setNow] = useState<Date>(new Date());
   const [dni, setDni] = useState<string>('');
   const [estado, setEstado] = useState<string>('');
-  const [fullScreen, setFullScreen] = useState(false);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -74,12 +71,13 @@ export default function AccesoScreen() {
     );
   }
 
-  const value = dni ? dni : '';
+  // Usar siempre los primeros 8 caracteres del correo
+  const value = user?.email?.substring(0, 8) || '';
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
       <TopBar title="Acceso al gimnasio" />
-      
+
       <View style={styles.container}>
         <View style={styles.section}>
           <ThemedText type="subtitle">Tu código de acceso</ThemedText>
@@ -96,60 +94,30 @@ export default function AccesoScreen() {
           ) : (
             <Skeleton style={{ width: 252, height: 252 }} />
           )}
-          
-          <View style={styles.userInfo}>
-            <ThemedText type="defaultSemiBold" style={{ textAlign: 'center' }}>
-              {user?.email || 'Cargando...'}
-            </ThemedText>
-            <ThemedText style={{ textAlign: 'center', opacity: 0.7 }}>
-              {dni ? `ID: ${dni}` : 'Obteniendo información...'}
-            </ThemedText>
+
+          {/* <View style={styles.userInfo}>
             {estado && (
-              <Badge 
-                label={estado === 'activo' ? 'Membresía Activa' : 'Membresía Inactiva'} 
-                variant={estado === 'activo' ? 'success' : 'destructive'} 
+              <Badge
+                label={estado === 'activo' ? 'Membresía Activa' : 'Membresía Inactiva'}
+                variant={estado === 'activo' ? 'success' : 'destructive'}
               />
             )}
-          </View>
-        </View>
-
-        <View style={styles.actions}>
-          <Button
-            title="Ampliar código"
-            variant="secondary"
-            onPress={() => setFullScreen(true)}
-            disabled={!value}
-          />
+          </View> */}
         </View>
 
         <View style={styles.timeContainer}>
           <ThemedText type="defaultSemiBold" style={styles.timeText}>
-            {now.toLocaleTimeString('es-MX', { 
-              hour: '2-digit', 
-              minute: '2-digit', 
-              second: '2-digit' 
+            {now.toLocaleTimeString('es-PE', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit'
             })}
           </ThemedText>
-          <ThemedText style={{ opacity: 0.7, textAlign: 'center' }}>
+          {/* <ThemedText style={{ opacity: 0.7, textAlign: 'center' }}>
             Hora actual del sistema
-          </ThemedText>
+          </ThemedText> */}
         </View>
       </View>
-
-      {fullScreen && (
-        <View style={styles.fullScreenOverlay}>
-          <View style={styles.qrBoxLarge}>
-            <QRCode value={value} size={300} />
-          </View>
-          <ThemedText style={{ color: '#fff', textAlign: 'center', fontSize: 18 }}>
-            {user?.email}
-          </ThemedText>
-          <ThemedText style={{ color: '#fff', textAlign: 'center', opacity: 0.8 }}>
-            {dni ? `ID: ${dni}` : 'Cargando información...'}
-          </ThemedText>
-          <Button title="Cerrar" variant="secondary" onPress={() => setFullScreen(false)} />
-        </View>
-      )}
     </Screen>
   );
 }
@@ -181,20 +149,9 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-  qrBoxLarge: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 12,
-    borderColor: '#ddd',
-    borderWidth: 1,
-  },
   userInfo: {
     alignItems: 'center',
     gap: 8,
-  },
-  actions: {
-    alignItems: 'center',
-    marginVertical: 20,
   },
   timeContainer: {
     alignItems: 'center',
@@ -203,17 +160,5 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 24,
     fontFamily: Fonts.rounded,
-  },
-  fullScreenOverlay: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.9)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    padding: 20,
   },
 });
