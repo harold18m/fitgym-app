@@ -7,42 +7,30 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TopBar } from '@/components/ui/top-bar';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/utils/supabase';
-import type { User } from '@supabase/supabase-js';
+import { useClienteByEmail } from '@/hooks/queries/useCliente';
+import { getUser } from '@/services/auth.service';
 import { useEffect, useState } from 'react';
 
 export default function PerfilScreen() {
   const { logout } = useAuth();
-  const [user, setUser] = useState<User | null>(null);
-  const [fotoPerfil, setFotoPerfil] = useState<string>('');
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
+  // Cargar email del usuario
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user ?? null);
+      const result = await getUser();
+      if (result.success) {
+        setUserEmail(result.data?.user?.email ?? null);
+      }
     };
     load();
   }, []);
 
-  useEffect(() => {
-    const fetchCliente = async () => {
-      const email = user?.email;
-      if (!email) return;
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('avatar_url')
-        .eq('email', email)
-        .single();
-      if (error) {
-        console.log('Error obteniendo foto de perfil', error.message);
-        return;
-      }
-      setFotoPerfil(data?.avatar_url || '');
-    };
-    fetchCliente();
-  }, [user?.email]);
+  // Usar hook con React Query para obtener cliente
+  const { data: cliente, isLoading, error } = useClienteByEmail(userEmail);
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
@@ -60,12 +48,16 @@ export default function PerfilScreen() {
             <View style={styles.row}>
               <Avatar
                 size="lg"
-                src={fotoPerfil ? { uri: fotoPerfil } : undefined}
+                src={cliente?.avatar_url ? { uri: cliente.avatar_url } : undefined}
               />
               <View style={{ flex: 1 }}>
-                <ThemedText type="defaultSemiBold" darkColor="#111">
-                  {user?.email?.substring(0, 8) ?? 'usuario@example.com'}
-                </ThemedText>
+                {isLoading ? (
+                  <Skeleton style={{ width: '60%', height: 16, marginBottom: 4 }} />
+                ) : (
+                  <ThemedText type="defaultSemiBold" darkColor="#111">
+                    {userEmail?.substring(0, 8) ?? 'usuario@example.com'}
+                  </ThemedText>
+                )}
                 <ThemedText darkColor="#666">Miembro desde enero 2024</ThemedText>
                 <Badge label="Activo" variant="success" />
               </View>

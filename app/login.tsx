@@ -1,29 +1,34 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-// import GoogleIcon from '@/components/ui/google-icon';
 import Logo from '@/components/logo';
 import { Screen } from '@/components/screen';
 import { ThemedText } from '@/components/themed-text';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
+import { showErrorAlert } from '@/lib/errors';
+import { loginFormSchema, type LoginFormData } from '@/lib/validators';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
   const { isAuthenticated, login } = useAuth();
   const router = useRouter();
-
   const insets = useSafeAreaInsets();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const isPasswordValid = password.length >= 6;
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginFormSchema),
+    defaultValues: { codigo: '', password: '' },
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -31,21 +36,14 @@ export default function LoginScreen() {
     }
   }, [isAuthenticated, router]);
 
-  const onSubmit = async () => {
-    if (!email || !password || !isPasswordValid) {
-      Alert.alert('Revisa los campos', 'Email o contraseña inválidos');
-      return;
-    }
+  const onSubmit = async (data: LoginFormData) => {
     try {
-      setLoading(true);
-      // concatenar email con dominio fijo
+      // Concatenar código con dominio fijo
       const domain = '@fitgym.com.pe';
-      const fullEmail = `${email}${domain}`;
-      await login(fullEmail, password);
-    } catch (e) {
-      // Error visible desde AuthContext
-    } finally {
-      setLoading(false);
+      const fullEmail = `${data.codigo}${domain}`;
+      await login(fullEmail, data.password);
+    } catch (error) {
+      showErrorAlert(error, 'Error de acceso');
     }
   };
 
@@ -66,9 +64,42 @@ export default function LoginScreen() {
 
           <Card>
             <CardContent>
-              <Input label="Código" placeholder="Tu código" value={email} onChangeText={setEmail} />
-              <Input label="Contraseña" placeholder="••••••" value={password} onChangeText={setPassword} secure />
-              <Button title={loading ? 'Entrando…' : 'Entrar'} variant="default" onPress={onSubmit} disabled={loading} />
+              <Controller
+                control={control}
+                name="codigo"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    label="Código"
+                    placeholder="Tu código"
+                    value={value}
+                    onChangeText={onChange}
+                    error={errors.codigo?.message}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field: { value, onChange } }) => (
+                  <Input
+                    label="Contraseña"
+                    placeholder="••••••"
+                    value={value}
+                    onChangeText={onChange}
+                    secure
+                    error={errors.password?.message}
+                    disabled={isSubmitting}
+                  />
+                )}
+              />
+              <Button
+                title={isSubmitting ? 'Entrando…' : 'Entrar'}
+                variant="default"
+                onPress={handleSubmit(onSubmit)}
+                disabled={isSubmitting}
+                loading={isSubmitting}
+              />
             </CardContent>
           </Card>
         </ScrollView>

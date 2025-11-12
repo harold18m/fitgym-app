@@ -1,6 +1,6 @@
+import { login as authServiceLogin, logout as authServiceLogout, getSession, onAuthStateChange } from '@/services/auth.service';
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { Alert } from 'react-native';
-import { supabase } from '@/utils/supabase';
 
 type AuthContextValue = {
   isAuthenticated: boolean;
@@ -17,31 +17,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const init = async () => {
-      const { data } = await supabase.auth.getSession();
-      setIsAuthenticated(!!data.session);
-      setAuthReady(true);
+      try {
+        const result = await getSession();
+        setIsAuthenticated(!!result.data?.session);
+      } catch (error) {
+        // Error silencioso si no hay sesión válida
+        console.log('No hay sesión activa');
+        setIsAuthenticated(false);
+      } finally {
+        setAuthReady(true);
+      }
     };
     init();
 
-    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: subscription } = onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
     });
-    return () => subscription.subscription.unsubscribe();
+    return () => subscription?.subscription.unsubscribe();
   }, []);
 
   const login = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      Alert.alert('Error de acceso', error.message);
-      throw error;
+    const result = await authServiceLogin(email, password);
+    if (!result.success) {
+      Alert.alert('Error de acceso', result.error || 'Error desconocido');
+      throw new Error(result.error);
     }
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      Alert.alert('Error al cerrar sesión', error.message);
-      throw error;
+    const result = await authServiceLogout();
+    if (!result.success) {
+      Alert.alert('Error al cerrar sesión', result.error || 'Error desconocido');
+      throw new Error(result.error);
     }
   };
 

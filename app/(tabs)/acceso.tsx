@@ -11,21 +11,22 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TopBar } from '@/components/ui/top-bar';
 import { Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/utils/supabase';
-import type { User } from '@supabase/supabase-js';
+import { useClienteByEmail } from '@/hooks/queries/useCliente';
+import { getUser } from '@/services/auth.service';
 
 export default function AccesoScreen() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [now, setNow] = useState<Date>(new Date());
-  const [dni, setDni] = useState<string>('');
-  const [estado, setEstado] = useState<string>('');
 
+  // Cargar email del usuario
   useEffect(() => {
     const loadUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user ?? null);
+      const result = await getUser();
+      if (result.success) {
+        setUserEmail(result.data?.user?.email ?? null);
+      }
       setNow(new Date());
     };
     loadUser();
@@ -36,26 +37,8 @@ export default function AccesoScreen() {
     return () => clearInterval(i);
   }, []);
 
-  useEffect(() => {
-    const fetchCliente = async () => {
-      const email = user?.email;
-      if (!email) return;
-      const { data, error } = await supabase
-        .from('clientes')
-        .select('dni, estado, nombre_membresia')
-        .eq('email', email)
-        .single();
-      if (error) {
-        console.log('Error obteniendo cliente', error.message);
-        setDni('');
-        setEstado('');
-        return;
-      }
-      setDni(data?.dni || '');
-      setEstado((data?.estado as string) || '');
-    };
-    fetchCliente();
-  }, [user?.email]);
+  // Usar hook con React Query para obtener cliente
+  const { isLoading } = useClienteByEmail(userEmail);
 
   if (!isAuthenticated) {
     return (
@@ -72,7 +55,7 @@ export default function AccesoScreen() {
   }
 
   // Usar siempre los primeros 8 caracteres del correo
-  const value = user?.email?.substring(0, 8) || '';
+  const value = userEmail?.substring(0, 8) || '';
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
@@ -80,29 +63,19 @@ export default function AccesoScreen() {
 
       <View style={styles.container}>
         <View style={styles.section}>
-          {/* <ThemedText type="subtitle">Tu código de acceso</ThemedText> */}
           <ThemedText style={{ textAlign: 'center', marginBottom: 20 }}>
             Muestra este código QR en la entrada del gimnasio
           </ThemedText>
         </View>
 
         <View style={styles.qrContainer}>
-          {value ? (
+          {!isLoading && value ? (
             <View style={styles.qrBox}>
               <QRCode value={value} size={220} />
             </View>
           ) : (
             <Skeleton style={{ width: 252, height: 252 }} />
           )}
-
-          {/* <View style={styles.userInfo}>
-            {estado && (
-              <Badge
-                label={estado === 'activo' ? 'Membresía Activa' : 'Membresía Inactiva'}
-                variant={estado === 'activo' ? 'success' : 'destructive'}
-              />
-            )}
-          </View> */}
         </View>
 
         <View style={styles.timeContainer}>
@@ -113,9 +86,6 @@ export default function AccesoScreen() {
               second: '2-digit'
             })}
           </ThemedText>
-          {/* <ThemedText style={{ opacity: 0.7, textAlign: 'center' }}>
-            Hora actual del sistema
-          </ThemedText> */}
         </View>
       </View>
     </Screen>

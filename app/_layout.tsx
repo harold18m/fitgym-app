@@ -5,6 +5,7 @@ import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { AuthProvider } from '@/contexts/AuthContext';
+import { ReactQueryProvider } from '@/lib/query-client';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -13,19 +14,21 @@ export const unstable_settings = {
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AuthProvider>
-        <ThemeProvider value={DarkTheme}>
-          <Stack initialRouteName="index">
-            {/* Splash inicial */}
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            {/* Pantalla Login fuera de tabs */}
-            <Stack.Screen name="login" options={{ headerShown: false, title: 'Login' }} />
-            {/* Tabs principales */}
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          </Stack>
-          <StatusBar style="light" backgroundColor="transparent" translucent />
-        </ThemeProvider>
-      </AuthProvider>
+      <ReactQueryProvider>
+        <AuthProvider>
+          <ThemeProvider value={DarkTheme}>
+            <Stack initialRouteName="index">
+              {/* Splash inicial */}
+              <Stack.Screen name="index" options={{ headerShown: false }} />
+              {/* Pantalla Login fuera de tabs */}
+              <Stack.Screen name="login" options={{ headerShown: false, title: 'Login' }} />
+              {/* Tabs principales */}
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+            <StatusBar style="light" backgroundColor="transparent" translucent />
+          </ThemeProvider>
+        </AuthProvider>
+      </ReactQueryProvider>
     </SafeAreaProvider>
   );
 }
