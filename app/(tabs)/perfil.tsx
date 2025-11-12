@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, View, ScrollView } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 
@@ -7,7 +7,6 @@ import { Avatar } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Skeleton } from '@/components/ui/skeleton';
 import { TopBar } from '@/components/ui/top-bar';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/utils/supabase';
@@ -17,6 +16,7 @@ import { useEffect, useState } from 'react';
 export default function PerfilScreen() {
   const { logout } = useAuth();
   const [user, setUser] = useState<User | null>(null);
+  const [fotoPerfil, setFotoPerfil] = useState<string>('');
 
   useEffect(() => {
     const load = async () => {
@@ -25,6 +25,24 @@ export default function PerfilScreen() {
     };
     load();
   }, []);
+
+  useEffect(() => {
+    const fetchCliente = async () => {
+      const email = user?.email;
+      if (!email) return;
+      const { data, error } = await supabase
+        .from('clientes')
+        .select('avatar_url')
+        .eq('email', email)
+        .single();
+      if (error) {
+        console.log('Error obteniendo foto de perfil', error.message);
+        return;
+      }
+      setFotoPerfil(data?.avatar_url || '');
+    };
+    fetchCliente();
+  }, [user?.email]);
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
@@ -40,27 +58,17 @@ export default function PerfilScreen() {
           <ThemedText type="subtitle">Información personal</ThemedText>
           <View style={styles.cardLight}>
             <View style={styles.row}>
-              <Avatar size="lg" name={user?.email ?? 'Usuario FitGym'} />
+              <Avatar
+                size="lg"
+                src={fotoPerfil ? { uri: fotoPerfil } : undefined}
+              />
               <View style={{ flex: 1 }}>
                 <ThemedText type="defaultSemiBold" darkColor="#111">
-                  {user?.email ?? 'usuario@example.com'}
+                  {user?.email?.substring(0, 8) ?? 'usuario@example.com'}
                 </ThemedText>
                 <ThemedText darkColor="#666">Miembro desde enero 2024</ThemedText>
                 <Badge label="Activo" variant="success" />
               </View>
-            </View>
-            <Separator />
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Teléfono</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">+52 55 1234 5678</ThemedText>
-            </View>
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Fecha de nacimiento</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">15 marzo 1990</ThemedText>
-            </View>
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Contacto de emergencia</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">María García - +52 55 9876 5432</ThemedText>
             </View>
           </View>
         </View>
@@ -89,8 +97,8 @@ export default function PerfilScreen() {
               <ThemedText type="defaultSemiBold" darkColor="#111">$899 MXN</ThemedText>
             </View>
           </View>
-          
-          <View style={styles.cardLight}>
+
+          {/* <View style={styles.cardLight}>
             <ThemedText type="defaultSemiBold" darkColor="#111">Beneficios incluidos</ThemedText>
             <View style={styles.benefitsList}>
               <ThemedText darkColor="#666">• Acceso 24/7 al gimnasio</ThemedText>
@@ -99,7 +107,7 @@ export default function PerfilScreen() {
               <ThemedText darkColor="#666">• Rutinas personalizadas</ThemedText>
               <ThemedText darkColor="#666">• Acceso a zona de spa</ThemedText>
             </View>
-          </View>
+          </View> */}
         </View>
 
         <View style={styles.section}>

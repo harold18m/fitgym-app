@@ -76,11 +76,11 @@ export default function AccesoScreen() {
 
   return (
     <Screen contentPadding={20} style={{ flex: 1 }}>
-      <TopBar title="Acceso al gimnasio" />
+      <TopBar showBack={false} title="Acceso al gimnasio" />
 
       <View style={styles.container}>
         <View style={styles.section}>
-          <ThemedText type="subtitle">Tu código de acceso</ThemedText>
+          {/* <ThemedText type="subtitle">Tu código de acceso</ThemedText> */}
           <ThemedText style={{ textAlign: 'center', marginBottom: 20 }}>
             Muestra este código QR en la entrada del gimnasio
           </ThemedText>
