@@ -1,3 +1,4 @@
+import { AuthError, logger } from '@/lib/errors';
 import { supabase } from '@/utils/supabase';
 
 /**
@@ -11,13 +12,13 @@ export async function login(email: string, password: string) {
         });
 
         if (error) {
-            throw new Error(error.message);
+            logger.error('Error en login', error);
+            throw new AuthError(error.message, 'AUTH_LOGIN_FAILED');
         }
 
         return { success: true, data };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Error desconocido';
-        console.error('Error en login:', message);
         return { success: false, error: message };
     }
 }
@@ -30,13 +31,13 @@ export async function logout() {
         const { error } = await supabase.auth.signOut();
 
         if (error) {
-            throw new Error(error.message);
+            logger.error('Error en logout', error);
+            throw new AuthError(error.message, 'AUTH_LOGOUT_FAILED');
         }
 
         return { success: true };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Error desconocido';
-        console.error('Error en logout:', message);
         return { success: false, error: message };
     }
 }
@@ -54,15 +55,16 @@ export async function getSession() {
             if (error.message.includes('Refresh Token')) {
                 return { success: true, data: { session: null } };
             }
-            throw new Error(error.message);
+            logger.error('Error en getSession', error);
+            throw new AuthError(error.message, 'AUTH_SESSION_FAILED');
         }
 
         return { success: true, data };
     } catch (error) {
         const message = error instanceof Error ? error.message : 'Error desconocido';
-        // No mostrar error de refresh token en logs
-        if (!message.includes('Refresh Token')) {
-            console.error('Error en getSession:', message);
+        // Errores de refresh token no se tratan como fallo
+        if (message.includes('Refresh Token')) {
+            return { success: true, data: { session: null } };
         }
         return { success: true, data: { session: null } };
     }

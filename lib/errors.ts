@@ -16,6 +16,45 @@ export class AppError extends Error {
     }
 }
 
+export class AuthError extends AppError {
+    constructor(message: string, code?: string) {
+        super(message, code, 401);
+        this.name = 'AuthError';
+    }
+}
+
+/**
+ * Mapeo de mensajes de error de Supabase a mensajes user-friendly
+ */
+const AUTH_ERROR_MESSAGES: Record<string, string> = {
+    'Invalid login credentials': 'Código o contraseña incorrectos',
+    'Invalid Refresh Token': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente',
+    'Refresh Token Not Found': 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente',
+    'Email not confirmed': 'Por favor, confirma tu email antes de iniciar sesión',
+    'User already registered': 'Este usuario ya está registrado',
+    'Invalid email': 'El formato del email no es válido',
+};
+
+/**
+ * Obtener mensaje user-friendly para errores de autenticación
+ */
+export function getAuthErrorMessage(error: string): string {
+    // Buscar coincidencia exacta
+    if (AUTH_ERROR_MESSAGES[error]) {
+        return AUTH_ERROR_MESSAGES[error];
+    }
+
+    // Buscar coincidencia parcial
+    for (const [key, value] of Object.entries(AUTH_ERROR_MESSAGES)) {
+        if (error.includes(key)) {
+            return value;
+        }
+    }
+
+    // Mensaje genérico
+    return 'Error al procesar tu solicitud. Por favor, intenta nuevamente';
+}
+
 /**
  * Clasificar y manejar diferentes tipos de errores
  */
@@ -26,6 +65,11 @@ export function handleError(error: unknown): { message: string; code?: string } 
         return { message: `Validación: ${messages}` };
     }
 
+    // Errores de autenticación
+    if (error instanceof AuthError) {
+        return { message: error.message, code: error.code };
+    }
+
     // Errores de aplicación
     if (error instanceof AppError) {
         return { message: error.message, code: error.code };
@@ -33,7 +77,9 @@ export function handleError(error: unknown): { message: string; code?: string } 
 
     // Errores estándar
     if (error instanceof Error) {
-        return { message: error.message };
+        // Intentar obtener mensaje user-friendly para errores de auth
+        const friendlyMessage = getAuthErrorMessage(error.message);
+        return { message: friendlyMessage };
     }
 
     // Errores desconocidos
@@ -45,7 +91,10 @@ export function handleError(error: unknown): { message: string; code?: string } 
  */
 export function showErrorAlert(error: unknown, title: string = 'Error') {
     const { message } = handleError(error);
-    console.error(`[${title}]`, message);
+    // Solo loguear en desarrollo
+    if (__DEV__) {
+        console.error(`[${title}]`, message);
+    }
     Alert.alert(title, message);
 }
 
@@ -54,14 +103,21 @@ export function showErrorAlert(error: unknown, title: string = 'Error') {
  */
 export const logger = {
     error: (message: string, error?: unknown) => {
-        console.error(`[ERROR] ${message}`, error);
+        if (__DEV__) {
+            console.error(`[ERROR] ${message}`, error);
+        }
         // TODO: Integrar Sentry aquí
+        // Sentry.captureException(error, { extra: { message } });
     },
     warn: (message: string) => {
-        console.warn(`[WARN] ${message}`);
+        if (__DEV__) {
+            console.warn(`[WARN] ${message}`);
+        }
     },
     info: (message: string) => {
-        console.log(`[INFO] ${message}`);
+        if (__DEV__) {
+            console.info(`[INFO] ${message}`);
+        }
     },
     debug: (message: string, data?: unknown) => {
         if (__DEV__) {
