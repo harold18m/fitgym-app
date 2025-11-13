@@ -17,7 +17,7 @@ import { loginFormSchema, type LoginFormData } from '@/lib/validators';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function LoginScreen() {
-  const { isAuthenticated, login } = useAuth();
+  const { isAuthenticated, authReady, login } = useAuth();
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -31,10 +31,10 @@ export default function LoginScreen() {
   });
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace('/(tabs)');
+    if (authReady && isAuthenticated) {
+      router.replace('/(tabs)/perfil');
     }
-  }, [isAuthenticated, router]);
+  }, [authReady, isAuthenticated, router]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
