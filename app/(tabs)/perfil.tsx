@@ -1,4 +1,4 @@
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 
@@ -10,7 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TopBar } from '@/components/ui/top-bar';
 import { useAuth } from '@/contexts/AuthContext';
-import { useClienteByEmail } from '@/hooks/queries/useCliente';
+import { useClienteByEmail } from '@/hooks/queries';
 import { getUser } from '@/services/auth.service';
 import { useEffect, useState } from 'react';
 
@@ -23,7 +23,10 @@ export default function PerfilScreen() {
     const load = async () => {
       const result = await getUser();
       if (result.success) {
-        setUserEmail(result.data?.user?.email ?? null);
+        const email = result.data?.user?.email;
+        setUserEmail(email ?? null);
+      } else {
+        console.log('❌ Error en getUser:', result.error);
       }
     };
     load();
@@ -37,11 +40,11 @@ export default function PerfilScreen() {
       <TopBar
         title="Perfil"
         showBack={false}
-        rightIconName="gearshape.fill"
-        onPressRight={() => Alert.alert('Configuración', 'Próximamente')}
+      // rightIconName="gearshape.fill"
+      // onPressRight={() => Alert.alert('Configuración', 'Próximamente')}
       />
 
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1 }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, paddingHorizontal: 10 }}>
         <View style={styles.section}>
           <ThemedText type="subtitle">Información personal</ThemedText>
           <View style={styles.cardLight}>
@@ -55,11 +58,27 @@ export default function PerfilScreen() {
                   <Skeleton style={{ width: '60%', height: 16, marginBottom: 4 }} />
                 ) : (
                   <ThemedText type="defaultSemiBold" darkColor="#111">
-                    {userEmail?.substring(0, 8) ?? 'usuario@example.com'}
+                    {cliente?.nombre ?? 'Nombre del Cliente'}
                   </ThemedText>
                 )}
-                <ThemedText darkColor="#666">Miembro desde enero 2024</ThemedText>
-                <Badge label="Activo" variant="success" />
+                {isLoading ? (
+                  <Skeleton style={{ width: '50%', height: 14, marginBottom: 4 }} />
+                ) : (
+                  <ThemedText darkColor="#666">
+                    {cliente?.fecha_registro
+                      ? `Miembro desde ${new Date(cliente.fecha_registro).toLocaleDateString('es-ES', { year: 'numeric', month: 'long' })}`
+                      : 'Miembro'
+                    }
+                  </ThemedText>
+                )}
+                {isLoading ? (
+                  <Skeleton style={{ width: 80, height: 20, marginTop: 8 }} />
+                ) : (
+                  <Badge
+                    label={cliente?.estado === 'activa' ? 'Activa' : cliente?.estado === 'vencida' ? 'Vencida' : 'Suspendida'}
+                    variant={cliente?.estado === 'activa' ? 'success' : 'destructive'}
+                  />
+                )}
               </View>
             </View>
           </View>
@@ -69,57 +88,134 @@ export default function PerfilScreen() {
           <ThemedText type="subtitle">Mi membresía</ThemedText>
           <View style={styles.cardLight}>
             <View style={styles.membershipHeader}>
-              <View>
-                <ThemedText type="defaultSemiBold" darkColor="#111">Plan Premium</ThemedText>
-                <ThemedText darkColor="#666">Acceso completo al gimnasio</ThemedText>
+              <View style={{ flex: 1 }}>
+                {isLoading ? (
+                  <>
+                    <Skeleton style={{ width: 150, height: 16, marginBottom: 4 }} />
+                    <Skeleton style={{ width: 200, height: 14 }} />
+                  </>
+                ) : (
+                  <>
+                    <ThemedText type="defaultSemiBold" darkColor="#111">
+                      {cliente?.membresias?.nombre ?? 'Sin membresía'}
+                    </ThemedText>
+                    <ThemedText darkColor="#666">
+                      {cliente?.membresias?.tipo ?? 'Acceso'}
+                    </ThemedText>
+                  </>
+                )}
               </View>
-              <Badge label="Activa" variant="success" />
+              <Badge
+                label={cliente?.estado === 'activa' ? 'Activa' : 'Vencida'}
+                variant={cliente?.estado === 'activa' ? 'success' : 'destructive'}
+              />
             </View>
             <Separator />
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Fecha de inicio</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">1 enero 2024</ThemedText>
-            </View>
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Próximo pago</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">1 febrero 2024</ThemedText>
-            </View>
-            <View style={styles.infoRow}>
-              <ThemedText darkColor="#666">Precio mensual</ThemedText>
-              <ThemedText type="defaultSemiBold" darkColor="#111">$899 MXN</ThemedText>
-            </View>
-          </View>
 
-          {/* <View style={styles.cardLight}>
-            <ThemedText type="defaultSemiBold" darkColor="#111">Beneficios incluidos</ThemedText>
-            <View style={styles.benefitsList}>
-              <ThemedText darkColor="#666">• Acceso 24/7 al gimnasio</ThemedText>
-              <ThemedText darkColor="#666">• Clases grupales ilimitadas</ThemedText>
-              <ThemedText darkColor="#666">• Asesoría nutricional</ThemedText>
-              <ThemedText darkColor="#666">• Rutinas personalizadas</ThemedText>
-              <ThemedText darkColor="#666">• Acceso a zona de spa</ThemedText>
-            </View>
-          </View> */}
+            {/* Datos de membresía */}
+            {isLoading ? (
+              <>
+                <Skeleton style={{ width: '100%', height: 16, marginBottom: 8 }} />
+                <Skeleton style={{ width: '80%', height: 16, marginBottom: 8 }} />
+              </>
+            ) : (
+              <>
+                {cliente?.membresias?.modalidad && (
+                  <View style={styles.infoRow}>
+                    <ThemedText darkColor="#666">Modalidad</ThemedText>
+                    <ThemedText type="defaultSemiBold" darkColor="#111">
+                      {cliente.membresias.modalidad}
+                    </ThemedText>
+                  </View>
+                )}
+                {cliente?.membresias?.precio && (
+                  <View style={styles.infoRow}>
+                    <ThemedText darkColor="#666">Precio</ThemedText>
+                    <ThemedText type="defaultSemiBold" darkColor="#111">
+                      S/ {Number(cliente.membresias.precio).toFixed(2)}
+                    </ThemedText>
+                  </View>
+                )}
+                {/* {cliente?.membresias?.duracion && (
+                  <View style={styles.infoRow}>
+                    <ThemedText darkColor="#666">Duración</ThemedText>
+                    <ThemedText type="defaultSemiBold" darkColor="#111">
+                      {cliente.membresias.duracion} días
+                    </ThemedText>
+                  </View>
+                )} */}
+              </>
+            )}
+
+            <Separator />
+
+            {/* Fechas de membresía */}
+            {cliente?.fecha_inicio && (
+              <View style={styles.infoRow}>
+                <ThemedText darkColor="#666">Fecha de inicio</ThemedText>
+                <ThemedText type="defaultSemiBold" darkColor="#111">
+                  {new Date(cliente.fecha_inicio).toLocaleDateString('es-ES')}
+                </ThemedText>
+              </View>
+            )}
+            {cliente?.fecha_fin && (
+              <View style={styles.infoRow}>
+                <ThemedText darkColor="#666">Fecha de vencimiento</ThemedText>
+                <ThemedText type="defaultSemiBold" darkColor="#111">
+                  {new Date(cliente.fecha_fin).toLocaleDateString('es-ES')}
+                </ThemedText>
+              </View>
+            )}
+
+            {/* Características de la membresía */}
+            {!isLoading && cliente?.membresias?.caracteristicas && cliente.membresias.caracteristicas.length > 0 && (
+              <>
+                <Separator />
+                <View>
+                  <ThemedText type="defaultSemiBold" darkColor="#111">Beneficios incluidos</ThemedText>
+                  <View style={styles.benefitsList}>
+                    {cliente.membresias.caracteristicas.map((caracteristica, index) => (
+                      <ThemedText key={index} darkColor="#666">
+                        • {caracteristica}
+                      </ThemedText>
+                    ))}
+                  </View>
+                </View>
+              </>
+            )}
+          </View>
         </View>
 
         <View style={styles.section}>
           <ThemedText type="subtitle">Estadísticas</ThemedText>
           <View style={styles.statsGrid}>
             <View style={styles.statCard}>
-              <ThemedText type="defaultSemiBold" darkColor="#111">28</ThemedText>
-              <ThemedText darkColor="#666">Visitas este mes</ThemedText>
+              {isLoading ? (
+                <Skeleton style={{ width: 40, height: 24, marginBottom: 4 }} />
+              ) : (
+                <ThemedText type="defaultSemiBold" darkColor="#111">
+                  {cliente?.asistencias ?? 0}
+                </ThemedText>
+              )}
+              <ThemedText darkColor="#666">Total de visitas</ThemedText>
             </View>
             <View style={styles.statCard}>
-              <ThemedText type="defaultSemiBold" darkColor="#111">156</ThemedText>
-              <ThemedText darkColor="#666">Total de visitas</ThemedText>
+              {isLoading ? (
+                <Skeleton style={{ width: 40, height: 24, marginBottom: 4 }} />
+              ) : (
+                <ThemedText type="defaultSemiBold" darkColor="#111">
+                  {cliente?.fecha_registro ? new Date(cliente.fecha_registro).toLocaleDateString('es-ES') : 'N/A'}
+                </ThemedText>
+              )}
+              <ThemedText darkColor="#666">Miembro desde</ThemedText>
             </View>
           </View>
         </View>
 
         <View style={styles.section}>
           <View style={styles.buttonContainer}>
-            <Button title="Editar perfil" variant="secondary" onPress={() => Alert.alert('Editar', 'Próximamente')} />
-            <Button title="Renovar membresía" onPress={() => Alert.alert('Renovar', 'Próximamente')} />
+            {/* <Button title="Editar perfil" variant="secondary" onPress={() => Alert.alert('Editar', 'Próximamente')} />
+            <Button title="Renovar membresía" onPress={() => Alert.alert('Renovar', 'Próximamente')} /> */}
             <Button title="Cerrar sesión" variant="destructive" onPress={logout} />
           </View>
         </View>

@@ -5,6 +5,7 @@ import QRCode from 'react-native-qrcode-svg';
 
 import { ThemedText } from '@/components/themed-text';
 
+import Logo from '@/components/logo';
 import { Screen } from '@/components/screen';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -99,7 +100,6 @@ const styles = StyleSheet.create({
   },
   section: {
     alignItems: 'center',
-    marginBottom: 20,
   },
   qrContainer: {
     alignItems: 'center',

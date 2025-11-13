@@ -25,6 +25,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarItemStyle: { display: 'none' }, // Temporalmente oculto
         }}
       />
       <Tabs.Screen
@@ -32,13 +33,7 @@ export default function TabLayout() {
         options={{
           title: 'Ejercicios',
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="figure.walk" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="membresia"
-        options={{
-          title: 'Membresía',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="creditcard.fill" color={color} />,
+          tabBarItemStyle: { display: 'none' }, // Temporalmente oculto
         }}
       />
       <Tabs.Screen
