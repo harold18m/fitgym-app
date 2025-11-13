@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TopBar } from '@/components/ui/top-bar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useClienteByEmail } from '@/hooks/queries';
+import { logger } from '@/lib/errors';
 import { getUser } from '@/services/auth.service';
 import { useEffect, useState } from 'react';
 
@@ -26,7 +27,7 @@ export default function PerfilScreen() {
         const email = result.data?.user?.email;
         setUserEmail(email ?? null);
       } else {
-        console.log('❌ Error en getUser:', result.error);
+        logger.error('Error al obtener usuario:', result.error);
       }
     };
     load();

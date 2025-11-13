@@ -21,8 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const result = await getSession();
         setIsAuthenticated(!!result.data?.session);
       } catch (error) {
-        // Error silencioso si no hay sesión válida
-        console.log('No hay sesión activa');
+
         setIsAuthenticated(false);
       } finally {
         setAuthReady(true);

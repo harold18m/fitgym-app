@@ -47,8 +47,6 @@ export async function fetchClienteByEmail(email: string): Promise<Cliente | null
             .eq('email', email)
             .maybeSingle();
 
-        console.log('📡 Datos RAW antes de validar:', JSON.stringify(data, null, 2));
-
         if (error) {
             console.error('❌ Error en consulta Supabase:', error.message, error.code);
             if (error.code === 'PGRST116') {
@@ -65,7 +63,6 @@ export async function fetchClienteByEmail(email: string): Promise<Cliente | null
         // Validar datos con Zod
         try {
             const validated = clienteSchema.parse(data);
-            console.log('✅ Datos validados con Zod:', JSON.stringify(validated, null, 2));
             return validated;
         } catch (validationError) {
             console.error('❌ Error de validación con Zod:', validationError);
